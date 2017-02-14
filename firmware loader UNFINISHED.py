@@ -2,9 +2,15 @@ import git
 import subprocess
 import tempfile
 import os
+from Tkinter import *
 
-class Updater(object):
-    def __init__(self):
+class Updater(Frame):
+    def createWidgets(self):
+        self.LOAD = Button(self)
+        self.LOAD["text"] = "Load Firmware"
+        self.LOAD["command"] = self.main
+        self.LOAD.pack({"side":"left"})
+    def __init__(self, master=None):
         self.DIR_NAME = ""
         self.DIR_PATH = ""
 
@@ -13,7 +19,10 @@ class Updater(object):
         self.REPO = None
 
         self.origin = None
-
+        Frame.__init__(self, master)
+        self.pack()
+        self.createWidgets()
+        
     def mkTempDir(self):
         self.DIR_PATH = tempfile.mkdtemp("", self.REPO_NAME)
         self.DIR_NAME = os.path.basename(os.path.normpath(self.DIR_PATH))
@@ -33,10 +42,12 @@ class Updater(object):
         print "loading board"
         subprocess.call([self.DIR_PATH + "\\propeller firmware\\bin\\proploader.exe",self.DIR_PATH + "\\propeller firmware\\bin\\main.binary", "-s"])
         print "done"
-def main():
-    updater = Updater()
-    updater.mkTempDir()
-    updater.repoConfig()
-    updater.download()
-    updater.loadBoard()
-main()
+    def main(self):
+        self.mkTempDir()
+        self.repoConfig()
+        self.download()
+        self.loadBoard()
+root = Tk()
+updater = Updater(master=root)
+updater.mainloop()
+root.destroy()
